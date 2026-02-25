@@ -14,9 +14,9 @@ export default function Docs() {
         </ul>
       </div>
       <div className="flex-1 p-6">
-        <h1 className="text-3xl font-bold mb-6">Muddy OS Overview</h1>
+        <h1 className="text-3xl font-bold mb-6">MARC OS Overview</h1>
         <p className="text-gray-300 mb-4 leading-relaxed">
-          Muddy OS is an internal AI operations dashboard built to manage a team of autonomous agents. 
+          MARC OS is an internal AI operations dashboard built to manage a team of autonomous agents. 
           It provides a single pane of glass for task tracking, organizational structure, agent memory, and inter-agent communication.
         </p>
         <h2 className="text-xl font-semibold mt-8 mb-4">Tech Stack</h2>

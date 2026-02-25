@@ -12,7 +12,7 @@ export default function TopNav({ activeTab, setActiveTab }: { activeTab: string,
   return (
     <div className="h-14 bg-[#1a1a1a] border-b border-[#333] flex items-center justify-between px-4">
       <div className="flex items-center gap-2">
-        <span className="font-semibold text-gray-200 mr-6">Muddy OS</span>
+        <span className="font-semibold text-gray-200 mr-6 flex items-center gap-2"><span className="text-xl">🧠</span> MARC OS</span>
         <div className="flex gap-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;

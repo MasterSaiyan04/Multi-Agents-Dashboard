@@ -113,7 +113,7 @@ export default function OrgChart() {
       <div className="flex justify-between items-end mb-8">
         <div>
           <h2 className="text-2xl font-semibold mb-1">Organization Chart</h2>
-          <p className="text-sm text-gray-500">Clearmud Labs - Operational Structure</p>
+          <p className="text-sm text-gray-500">InstaDesk - Operational Structure</p>
         </div>
         <div className="flex gap-2">
           <button onClick={expandAll} className="px-4 py-1.5 bg-[#1a1a1a] border border-[#333] text-sm rounded-md hover:bg-[#222] transition-colors">Expand All</button>
@@ -135,7 +135,7 @@ export default function OrgChart() {
       <div className="flex flex-col items-center">
         {/* Human */}
         <div className="relative flex flex-col items-center">
-          <div className="bg-[#1a1a1a] border border-yellow-500/30 rounded-xl p-4 w-72 text-center relative z-10 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
+          <div className="bg-[#1a1a1a] border border-yellow-500/30 rounded-xl p-4 w-72 text-center relative z-10 shadow-[0_0_15px_rgba(234,179,8,0.1)] hover:border-yellow-500/60 transition-colors cursor-pointer">
             <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-yellow-500 font-bold tracking-widest">CEO</div>
             <div className="w-12 h-12 bg-blue-500/20 rounded-full mx-auto mb-2 mt-3 flex items-center justify-center text-2xl">👨🏻‍💻</div>
             <h3 className="font-semibold text-gray-200">Marcelo Oliveira</h3>
@@ -148,10 +148,10 @@ export default function OrgChart() {
 
         {/* COO */}
         <div className="relative flex flex-col items-center">
-          <div className="bg-[#0a1f14] border border-green-500/30 rounded-xl p-4 w-80 text-center relative z-10 shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+          <div className="bg-[#0a1f14] border border-green-500/30 rounded-xl p-4 w-80 text-center relative z-10 shadow-[0_0_15px_rgba(34,197,94,0.1)] hover:border-green-500/60 transition-colors cursor-pointer">
             <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-yellow-500 font-bold tracking-widest">COO</div>
             <div className="w-12 h-12 bg-blue-600/20 rounded-full mx-auto mb-2 mt-3 flex items-center justify-center text-2xl">🔵</div>
-            <h3 className="font-semibold text-gray-200">Muddy</h3>
+            <h3 className="font-semibold text-gray-200">Marc</h3>
             <p className="text-xs text-gray-500 mt-1">Research · Delegation · Execution · Orchestration</p>
           </div>
           <div className="w-px h-6 bg-yellow-500/50"></div>
@@ -166,7 +166,7 @@ export default function OrgChart() {
           {/* Elon */}
           <div className="flex-1 flex flex-col items-center">
             <div className="w-px h-6 bg-yellow-500/50 mb-0"></div>
-            <div className="bg-[#111111] border-t-2 border-t-blue-500 border-x border-b border-[#333] rounded-xl p-4 w-full mb-4 shadow-lg">
+            <div className="bg-[#111111] border-t-2 border-t-blue-500 border-x border-b border-[#333] rounded-xl p-4 w-full mb-4 shadow-lg hover:border-blue-500/50 transition-colors cursor-pointer">
               <div className="flex items-center gap-3 mb-3">
                 <div className="text-3xl">🤖</div>
                 <div>
@@ -190,7 +190,7 @@ export default function OrgChart() {
           {/* Gary */}
           <div className="flex-1 flex flex-col items-center">
             <div className="w-px h-6 bg-yellow-500/50 mb-0"></div>
-            <div className="bg-[#111111] border-t-2 border-t-orange-500 border-x border-b border-[#333] rounded-xl p-4 w-full mb-4 shadow-lg">
+            <div className="bg-[#111111] border-t-2 border-t-orange-500 border-x border-b border-[#333] rounded-xl p-4 w-full mb-4 shadow-lg hover:border-orange-500/50 transition-colors cursor-pointer">
               <div className="flex items-center gap-3 mb-3">
                 <div className="text-3xl">🔴</div>
                 <div>
@@ -214,7 +214,7 @@ export default function OrgChart() {
           {/* Warren */}
           <div className="flex-1 flex flex-col items-center">
             <div className="w-px h-6 bg-yellow-500/50 mb-0"></div>
-            <div className="bg-[#111111] border-t-2 border-t-green-500 border-x border-b border-[#333] rounded-xl p-4 w-full mb-4 shadow-lg">
+            <div className="bg-[#111111] border-t-2 border-t-green-500 border-x border-b border-[#333] rounded-xl p-4 w-full mb-4 shadow-lg hover:border-green-500/50 transition-colors cursor-pointer">
               <div className="flex items-center gap-3 mb-3">
                 <div className="text-3xl">🟡</div>
                 <div>
@@ -279,7 +279,7 @@ export default function OrgChart() {
 
 function Department({ id, title, description, count, agents, isExpanded, onToggle }: any) {
   return (
-    <div className="bg-[#111111] border border-[#222] rounded-xl overflow-hidden shadow-sm">
+    <div className="bg-[#111111] border border-[#222] rounded-xl overflow-hidden shadow-sm hover:border-yellow-500/30 transition-colors">
       <div 
         className="flex justify-between items-center p-3 cursor-pointer hover:bg-[#1a1a1a] transition-colors"
         onClick={() => onToggle(id)}
@@ -296,7 +296,7 @@ function Department({ id, title, description, count, agents, isExpanded, onToggl
           {description && <p className="text-xs text-gray-500 mb-4 mt-2 leading-relaxed">{description}</p>}
           <div className="space-y-2">
             {agents.map((agent: any, i: number) => (
-              <div key={i} className="bg-[#1a1a1a] border border-[#333] rounded-lg p-3 hover:border-gray-500 transition-colors">
+              <div key={i} className="bg-[#1a1a1a] border border-[#333] rounded-lg p-3 hover:border-yellow-500/50 transition-colors cursor-pointer">
                 <div className="flex items-start gap-3 mb-3">
                   <div className="text-xl">{agent.emoji}</div>
                   <div>

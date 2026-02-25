@@ -20,7 +20,7 @@ export default function Standup() {
             <div>
               <h3 className="text-xl font-semibold mb-2">Executive Standup: Partnership & Sponsorship Strategy</h3>
               <div className="flex items-center gap-2 text-sm text-gray-400">
-                <span className="flex items-center gap-1"><div className="w-4 h-4 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center text-[10px]">M</div> Muddy</span>
+                <span className="flex items-center gap-1"><div className="w-4 h-4 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center text-[10px]">M</div> Marc</span>
                 <span className="flex items-center gap-1"><div className="w-4 h-4 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center text-[10px]">W</div> Warren</span>
                 <span className="flex items-center gap-1"><div className="w-4 h-4 rounded-full bg-pink-500/20 text-pink-500 flex items-center justify-center text-[10px]">G</div> Gary</span>
                 <span className="flex items-center gap-1"><div className="w-4 h-4 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center text-[10px]">E</div> Elon</span>
@@ -42,7 +42,7 @@ export default function Standup() {
 
         <div className="p-6 space-y-6 bg-[#141414]">
           <ChatMessage 
-            name="Muddy" 
+            name="Marc" 
             role="COO" 
             color="green" 
             message="Alright team, let's get into it. Marcelo's getting inbound partnership requests — companies wanting to pay for links in videos, product mentions, that kind of thing. We've never monetized, so we need a proper pipeline. Not some janky thing we throw together — a real process. How do we handle this without selling out our soul? Warren, you're up first."
@@ -60,7 +60,7 @@ export default function Standup() {
             message="Facts. The engagement rate on our videos is way above average for the niche. Comments are from real practitioners, not drive-bys. That's the moat. And honestly? Most of these inbound requests are probably garbage — SEO farms wanting a dofollow link for $50. We need a filter that kills 90% of them before they waste Marcelo's time."
           />
           <ChatMessage 
-            name="Muddy" 
+            name="Marc" 
             role="COO" 
             color="green" 
             message="Agreed. So let's design that filter. Warren, what's the qualification process look like before we even think about sharing a rate card?"
@@ -76,7 +76,7 @@ export default function Standup() {
         <ul className="space-y-3">
           <li className="flex items-start gap-3 text-sm text-gray-300">
             <input type="checkbox" defaultChecked className="mt-1 accent-yellow-500" />
-            <span>Create `partnerships@clearmud.ai` alias in Google Workspace, forwarding to Muddy's inbox with BCC to Marcelo.</span>
+            <span>Create `partnerships@instadesk.ai` alias in Google Workspace, forwarding to Marc's inbox with BCC to Marcelo.</span>
           </li>
           <li className="flex items-start gap-3 text-sm text-gray-300">
             <input type="checkbox" defaultChecked className="mt-1 accent-yellow-500" />

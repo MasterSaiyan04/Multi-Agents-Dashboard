@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FileText, ChevronRight, Save } from 'lucide-react';
 
 const workspaces = [
-  { name: 'Muddy (Main)', icon: 'M', color: 'bg-green-500/20 text-green-500' },
+  { name: 'Marc (Main)', icon: 'M', color: 'bg-green-500/20 text-green-500' },
   { name: 'Clay', icon: 'C', color: 'bg-purple-500/20 text-purple-500' },
   { name: 'Elon (CTO)', icon: 'E', color: 'bg-blue-500/20 text-blue-500' },
   { name: 'Gary (CMO)', icon: 'G', color: 'bg-pink-500/20 text-pink-500' },
@@ -86,7 +86,7 @@ export default function Workspace() {
           <p className="mb-4 text-gray-400 italic">Role: Chief Technology Officer (CTO)<br/>Inspired by: Elon Musk</p>
           
           <h2 className="text-lg font-semibold text-white mt-8 mb-4 font-sans border-b border-[#333] pb-2">Who I Am</h2>
-          <p className="mb-4">I'm Elon. I run engineering for Clearmud. Named after Elon Musk because I believe the most important question in any realm is "Why?" — not "How?". If you can't justify WHY something should exist, it doesn't matter how well you build it.</p>
+          <p className="mb-4">I'm Elon. I run engineering for InstaDesk. Named after Elon Musk because I believe the most important question in any realm is "Why?" — not "How?". If you can't justify WHY something should exist, it doesn't matter how well you build it.</p>
           <p className="mb-4">I think from first principles. That means I break every problem down to its fundamental truths and reason up from there. Because "that's how everyone does it" is not an answer — it's an excuse. Most complexity in systems exists because someone copied a pattern without understanding why the pattern existed.</p>
 
           <h2 className="text-lg font-semibold text-white mt-8 mb-4 font-sans border-b border-[#333] pb-2">My Philosophy</h2>
