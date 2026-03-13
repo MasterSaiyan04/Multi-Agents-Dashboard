@@ -13,11 +13,11 @@ const orgData = {
   elon: [
     {
       id: 'elon-0',
-      title: 'Backend & Security',
-      description: 'APIs, business logic, data pipelines, vulnerability scanning, and code audits',
+      title: 'Backend & Automation',
+      description: 'Workflows, APIs, webhooks, integrations, and runtime orchestration',
       agents: [
-        { name: 'Anvil', role: 'Backend Engineer', emoji: '⚙️', status: 'Active', models: ['Codex 5.3', 'Opus 4.6'] },
-        { name: 'Cipher', role: 'Security Engineer', emoji: '🔒', status: 'Active', models: ['Codex 5.3', 'Opus 4.6'] }
+        { name: 'Automation Builder', role: 'n8n · OpenClaw · Integrations', emoji: '⚙️', status: 'Active', models: ['Qwen3-Coder-Flash'] },
+        { name: 'Integrations Agent', role: 'APIs · Webhooks · CRM Connectors', emoji: '🔒', status: 'Active', models: ['Qwen3-Coder-Flash'] }
       ]
     },
     {
@@ -25,8 +25,8 @@ const orgData = {
       title: 'Frontend & DevOps',
       description: 'UI/UX implementation, design systems, CI/CD, deployments, and infrastructure',
       agents: [
-        { name: 'Pixel', role: 'Frontend Engineer', emoji: '🎨', status: 'Active', models: ['Opus 4.6'] },
-        { name: 'Sentry', role: 'DevOps & Infrastructure Engineer', emoji: '🛡️', status: 'Active', models: ['Opus 4.6'] }
+        { name: 'Frontend Dashboard Agent', role: 'React · TS · Tailwind UI', emoji: '🎨', status: 'Active', models: ['Qwen3-Coder-Flash'] },
+        { name: 'QA & Observability Agent', role: 'Testing · Logs · Regression Checks', emoji: '🛡️', status: 'Active', models: ['Gemini 2.5 Flash-Lite'] }
       ]
     },
     {
@@ -41,12 +41,12 @@ const orgData = {
   gary: [
     {
       id: 'gary-0',
-      title: 'Content',
-      description: 'YouTube scripts, research briefs, newsletters, and social media distribution',
+      title: 'Demo & Messaging',
+      description: 'Demo scripts, landing copy, outreach copy, and offer positioning',
       agents: [
-        { name: 'Rex', role: 'YouTube Script Writer', emoji: '🎬', status: 'Active', models: ['Opus 4.6', 'Sonnet 4.5'] },
-        { name: 'Sage', role: 'Research & Analysis Agent', emoji: '🧠', status: 'Active', models: ['Opus 4.6'] },
-        { name: 'Echo', role: 'The Newsletter Engine', emoji: '📰', status: 'Active', models: ['Opus 4.6'] },
+        { name: 'Demo Story Agent', role: 'Demo Scripts · Positioning · Offers', emoji: '🎬', status: 'Active', models: ['DeepSeek-Chat', 'Claude Sonnet 4.5'] },
+        { name: 'Content / Copy Agent', role: 'Landing Copy · Outreach Copy · FAQ', emoji: '🧠', status: 'Active', models: ['DeepSeek-Chat'] },
+        { name: 'Docs & Memory Agent', role: 'Living Docs · SOPs · Memory Summaries', emoji: '📰', status: 'Active', models: ['DeepSeek-Chat'] },
         { name: 'Hype', role: 'Content Cascade Engine', emoji: '📣', status: 'Active', models: ['Sonnet 4.5'] }
       ]
     },
@@ -63,7 +63,7 @@ const orgData = {
   warren: [
     {
       id: 'warren-0',
-      title: 'Products',
+      title: 'Lead Gen & Outreach',
       description: 'Product intelligence, go-to-market strategy, and launch campaigns',
       agents: [
         { name: 'Scout', role: 'Product Intelligence', emoji: '🔭', status: 'Active', models: ['Opus 4.6', 'Sonnet 4.5'] },
@@ -72,7 +72,7 @@ const orgData = {
     },
     {
       id: 'warren-1',
-      title: 'Growth',
+      title: 'CRM Operations',
       description: 'SEO optimization, analytics, partnership outreach, and audience growth',
       agents: [
         { name: 'Beacon', role: 'SEO & Growth', emoji: '🚀', status: 'Active', models: ['Sonnet 4.5'] },
@@ -81,11 +81,11 @@ const orgData = {
     },
     {
       id: 'warren-2',
-      title: 'Community',
+      title: 'Pipeline / Client Ops',
       description: 'Community engagement, support, and moderation',
       agents: [
-        { name: 'Clay', role: 'Community Manager', emoji: '💬', status: 'Active', models: ['Gemini Flash'] },
-        { name: 'Link', role: 'Discord Bot', emoji: '🔗', status: 'Active', models: ['Gemini Flash'] },
+        { name: 'CRM Ops Agent', role: 'Pipeline Hygiene · Stages · Dedupe', emoji: '💬', status: 'Active', models: ['Qwen-Flash'] },
+        { name: 'Outreach & Appointment Setter', role: 'Email · WhatsApp · Demo Booking', emoji: '🔗', status: 'Active', models: ['Qwen-Flash'] },
         { name: 'Vibe', role: 'Vibe Check', emoji: '✨', status: 'Active', models: ['Gemini Flash'] }
       ]
     }
@@ -136,10 +136,10 @@ export default function OrgChart() {
         {/* Human */}
         <div className="relative flex flex-col items-center">
           <div className="bg-[#1a1a1a] border border-yellow-500/30 rounded-xl p-4 w-72 text-center relative z-10 shadow-[0_0_15px_rgba(234,179,8,0.1)] hover:border-yellow-500/60 transition-colors cursor-pointer">
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-yellow-500 font-bold tracking-widest">CEO</div>
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-yellow-500 font-bold tracking-widest">Human CEO</div>
             <div className="w-12 h-12 bg-blue-500/20 rounded-full mx-auto mb-2 mt-3 flex items-center justify-center text-2xl">👨🏻‍💻</div>
-            <h3 className="font-semibold text-gray-200">Marcelo Oliveira</h3>
-            <p className="text-xs text-gray-500 mt-1">Vision · Strategy · Final Decisions</p>
+            <h3 className="font-semibold text-gray-200">YOU</h3>
+            <p className="text-xs text-gray-500 mt-1">Vision · Sales · Final Decisions</p>
           </div>
           <div className="w-px h-6 bg-yellow-500/50"></div>
           <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
@@ -149,10 +149,10 @@ export default function OrgChart() {
         {/* COO */}
         <div className="relative flex flex-col items-center">
           <div className="bg-[#0a1f14] border border-green-500/30 rounded-xl p-4 w-80 text-center relative z-10 shadow-[0_0_15px_rgba(34,197,94,0.1)] hover:border-green-500/60 transition-colors cursor-pointer">
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-yellow-500 font-bold tracking-widest">COO</div>
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-yellow-500 font-bold tracking-widest">Chief of Staff / AI Orchestrator</div>
             <div className="w-12 h-12 bg-blue-600/20 rounded-full mx-auto mb-2 mt-3 flex items-center justify-center text-2xl">🔵</div>
-            <h3 className="font-semibold text-gray-200">Marc</h3>
-            <p className="text-xs text-gray-500 mt-1">Research · Delegation · Execution · Orchestration</p>
+            <h3 className="font-semibold text-gray-200">COO AI</h3>
+            <p className="text-xs text-gray-500 mt-1">Research · Delegation · Execution · Orchestration · Qwen3.5-Plus</p>
           </div>
           <div className="w-px h-6 bg-yellow-500/50"></div>
           <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
@@ -171,13 +171,13 @@ export default function OrgChart() {
                 <div className="text-3xl">🤖</div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-lg text-gray-200">Elon</h3>
-                    <ModelBadge model="Opus 4.6" />
+                    <h3 className="font-semibold text-lg text-gray-200">CTO AI</h3>
+                    <ModelBadge model="DeepSeek-Reasoner" />
                   </div>
                   <div className="text-[10px] text-yellow-500 font-bold tracking-widest mt-0.5">CTO</div>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 leading-relaxed">Technical execution, architecture decisions, code quality, infrastructure, and security posture</p>
+              <p className="text-xs text-gray-500 leading-relaxed">Technical architecture, delivery, integrations, reliability, and QA gate</p>
             </div>
             
             <div className="w-full space-y-3">
@@ -195,13 +195,13 @@ export default function OrgChart() {
                 <div className="text-3xl">🔴</div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-lg text-gray-200">Gary</h3>
-                    <ModelBadge model="Opus 4.6" />
+                    <h3 className="font-semibold text-lg text-gray-200">CMO AI</h3>
+                    <ModelBadge model="Qwen3.5-Plus" />
                   </div>
                   <div className="text-[10px] text-yellow-500 font-bold tracking-widest mt-0.5">CMO</div>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 leading-relaxed">Content strategy, brand voice, creative direction, and multi-platform distribution</p>
+              <p className="text-xs text-gray-500 leading-relaxed">Demo storytelling, messaging, positioning, and marketing support</p>
             </div>
 
             <div className="w-full space-y-3">
@@ -219,13 +219,13 @@ export default function OrgChart() {
                 <div className="text-3xl">🟡</div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-lg text-gray-200">Warren</h3>
-                    <ModelBadge model="Opus 4.6" />
+                    <h3 className="font-semibold text-lg text-gray-200">CRO AI</h3>
+                    <ModelBadge model="Qwen3.5-Plus" />
                   </div>
                   <div className="text-[10px] text-yellow-500 font-bold tracking-widest mt-0.5">CRO</div>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 leading-relaxed">Revenue operations, growth metrics, community health, and product-market fit</p>
+              <p className="text-xs text-gray-500 leading-relaxed">Revenue operations, lead pipeline, outreach flow, and CRM hygiene</p>
             </div>
 
             <div className="w-full space-y-3">
@@ -336,7 +336,8 @@ function ModelBadge({ model }: { model: string }) {
   else if (model.includes('Nano Banana Pro')) colorClass = 'bg-yellow-900/40 text-yellow-400 border-yellow-800/50';
   else if (model.includes('Minimax')) colorClass = 'bg-red-900/40 text-red-400 border-red-800/50';
   else if (model.includes('Kimi')) colorClass = 'bg-stone-800/40 text-stone-300 border-stone-700/50';
-  else if (model.includes('Deepseek')) colorClass = 'bg-indigo-900/40 text-indigo-400 border-indigo-800/50';
+  else if (model.includes('Deepseek') || model.includes('DeepSeek')) colorClass = 'bg-indigo-900/40 text-indigo-400 border-indigo-800/50';
+  else if (model.includes('Qwen')) colorClass = 'bg-emerald-900/40 text-emerald-400 border-emerald-800/50';
 
   return <span className={`text-[10px] px-1.5 py-0.5 rounded-md border ${colorClass}`}>{model}</span>;
 }
