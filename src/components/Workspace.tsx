@@ -1,102 +1,248 @@
-import React, { useState } from 'react';
-import { FileText, ChevronRight, Save } from 'lucide-react';
+import { ChevronRight, FileText, Save } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-const workspaces = [
-  { name: 'Marc (Main)', icon: 'M', color: 'bg-green-500/20 text-green-500' },
-  { name: 'Clay', icon: 'C', color: 'bg-purple-500/20 text-purple-500' },
-  { name: 'Elon (CTO)', icon: 'E', color: 'bg-blue-500/20 text-blue-500' },
-  { name: 'Gary (CMO)', icon: 'G', color: 'bg-pink-500/20 text-pink-500' },
-  { name: 'Warren (CRO)', icon: 'W', color: 'bg-yellow-500/20 text-yellow-500' },
-];
+import type { WorkspaceFileDetail, WorkspaceSnapshot } from '../../shared/mission';
+import { fetchWorkspaceFile, saveWorkspaceFile } from '../lib/api';
 
-const files = [
-  { name: 'SOUL.md', size: '4.8KB' },
-  { name: 'IDENTITY.md', size: '1.2KB' },
-  { name: 'USER.md', size: '3.1KB' },
-  { name: 'TOOLS.md', size: '2.5KB' },
-  { name: 'AGENTS.md', size: '7.8KB' },
-  { name: 'MEMORY.md', size: '12.4KB' },
-];
+interface WorkspaceProps {
+  workspaces: WorkspaceSnapshot[];
+  initialWorkspaceId?: string | null;
+}
 
-export default function Workspace() {
-  const [activeWorkspace, setActiveWorkspace] = useState('Elon (CTO)');
-  const [activeFile, setActiveFile] = useState('SOUL.md');
+function formatSize(size: number) {
+  if (size >= 1024 * 1024) {
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  }
+  if (size >= 1024) {
+    return `${(size / 1024).toFixed(1)} KB`;
+  }
+  return `${size} B`;
+}
+
+export default function Workspace({ workspaces, initialWorkspaceId }: WorkspaceProps) {
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(
+    initialWorkspaceId || workspaces[0]?.id || null
+  );
+  const [activeFileId, setActiveFileId] = useState<string | null>(null);
+  const [fileDetail, setFileDetail] = useState<WorkspaceFileDetail | null>(null);
+  const [draft, setDraft] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const activeWorkspace =
+    workspaces.find((workspace) => workspace.id === activeWorkspaceId) || workspaces[0] || null;
+  const files = activeWorkspace?.files || [];
+
+  useEffect(() => {
+    if (!initialWorkspaceId) {
+      return;
+    }
+    setActiveWorkspaceId(initialWorkspaceId);
+  }, [initialWorkspaceId]);
+
+  useEffect(() => {
+    if (!activeWorkspace) {
+      return;
+    }
+
+    if (!activeWorkspace.files.find((file) => file.id === activeFileId)) {
+      setActiveFileId(activeWorkspace.files[0]?.id || null);
+    }
+  }, [activeWorkspace, activeFileId]);
+
+  useEffect(() => {
+    async function loadFile() {
+      if (!activeWorkspace || !activeFileId) {
+        setFileDetail(null);
+        setDraft('');
+        return;
+      }
+
+      setIsLoading(true);
+      setNotice(null);
+      try {
+        const detail = await fetchWorkspaceFile(activeWorkspace.id, activeFileId);
+        setFileDetail(detail);
+        setDraft(detail.content);
+      } catch (error) {
+        setNotice(error instanceof Error ? error.message : 'Unable to load file');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    void loadFile();
+  }, [activeWorkspace, activeFileId]);
+
+  async function handleSave() {
+    if (!activeWorkspace || !activeFileId) {
+      return;
+    }
+
+    setIsSaving(true);
+    setNotice(null);
+    try {
+      const detail = await saveWorkspaceFile(activeWorkspace.id, activeFileId, draft);
+      setFileDetail(detail);
+      setDraft(detail.content);
+      setNotice('File saved and indexed into docs.');
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Unable to save file');
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   return (
-    <div className="flex h-full gap-6">
-      <div className="w-64 flex-shrink-0 flex flex-col gap-6">
-        <div>
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Workspaces</h3>
-          <div className="space-y-1">
-            {workspaces.map(ws => (
+    <div className="flex h-full flex-col gap-6 xl:flex-row">
+      <aside className="w-full shrink-0 space-y-6 xl:w-80">
+        <div className="rounded-3xl border border-[#232323] bg-[#111111] p-5">
+          <div className="mb-4 text-xs uppercase tracking-[0.24em] text-gray-500">Workspaces</div>
+          <div className="space-y-2">
+            {workspaces.map((workspace) => (
               <button
-                key={ws.name}
-                onClick={() => setActiveWorkspace(ws.name)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                  activeWorkspace === ws.name ? 'bg-[#2a2a2a] text-white' : 'text-gray-400 hover:bg-[#222] hover:text-gray-200'
+                key={workspace.id}
+                onClick={() => setActiveWorkspaceId(workspace.id)}
+                className={`w-full rounded-2xl border px-4 py-3 text-left transition-colors ${
+                  activeWorkspaceId === workspace.id
+                    ? 'border-amber-400/30 bg-amber-500/10'
+                    : 'border-[#242424] bg-[#151515] hover:border-[#343434]'
                 }`}
               >
-                <div className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold ${ws.color}`}>
-                  {ws.icon}
+                <div className="flex items-center gap-3">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold ${workspace.color}`}>
+                    {workspace.icon}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-white">{workspace.name}</div>
+                    <div className="truncate text-xs text-gray-500">
+                      {workspace.branch || 'No branch'} · {workspace.activityCount} activities
+                    </div>
+                  </div>
                 </div>
-                {ws.name}
               </button>
             ))}
           </div>
         </div>
 
-        <div>
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Files</h3>
-          <div className="space-y-1">
-            {files.map(file => (
+        <div className="rounded-3xl border border-[#232323] bg-[#111111] p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="text-xs uppercase tracking-[0.24em] text-gray-500">Files</div>
+            <div className="text-xs text-gray-600">{files.length} indexed</div>
+          </div>
+          <div className="space-y-2">
+            {files.map((file) => (
               <button
-                key={file.name}
-                onClick={() => setActiveFile(file.name)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                  activeFile === file.name ? 'bg-yellow-500/10 text-yellow-500' : 'text-gray-400 hover:bg-[#222] hover:text-gray-200'
+                key={file.id}
+                onClick={() => setActiveFileId(file.id)}
+                className={`flex w-full items-center justify-between rounded-2xl border px-3 py-2 text-left transition-colors ${
+                  activeFileId === file.id
+                    ? 'border-amber-400/30 bg-amber-500/10'
+                    : 'border-[#242424] bg-[#151515] hover:border-[#343434]'
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <FileText size={14} />
-                  {file.name}
+                <div className="flex min-w-0 items-center gap-2">
+                  <FileText size={14} className="shrink-0 text-gray-500" />
+                  <span className="truncate text-sm text-gray-200">{file.name}</span>
                 </div>
-                <span className="text-[10px] text-gray-600">{file.size}</span>
+                <span className="text-[10px] uppercase tracking-[0.18em] text-gray-600">{formatSize(file.size)}</span>
               </button>
             ))}
           </div>
         </div>
-      </div>
+      </aside>
 
-      <div className="flex-1 bg-[#1a1a1a] border border-[#333] rounded-xl flex flex-col overflow-hidden">
-        <div className="h-12 border-b border-[#333] flex items-center justify-between px-4 bg-[#141414]">
-          <div className="flex items-center gap-2 text-sm text-gray-400">
-            <span>{activeWorkspace}</span>
-            <ChevronRight size={14} />
-            <span className="text-gray-200">{activeFile}</span>
+      <section className="min-h-[70vh] flex-1 rounded-3xl border border-[#232323] bg-[#111111]">
+        <div className="flex flex-col gap-4 border-b border-[#232323] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex min-w-0 items-center gap-2 text-sm text-gray-400">
+            <span>{activeWorkspace?.name || 'Workspace'}</span>
+            <ChevronRight size={14} className="shrink-0" />
+            <span className="truncate text-gray-100">{fileDetail?.name || 'Select a file'}</span>
           </div>
-          <div className="flex gap-2">
-            <button className="px-3 py-1 bg-[#2a2a2a] text-xs rounded hover:bg-[#333] transition-colors">Preview</button>
-            <button className="px-3 py-1 bg-yellow-500 text-black text-xs font-medium rounded hover:bg-yellow-400 transition-colors flex items-center gap-1">
-              <Save size={12} /> Save
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-600">
+              {fileDetail?.updatedAt ? new Date(fileDetail.updatedAt).toLocaleString() : ''}
+            </span>
+            <button
+              onClick={handleSave}
+              disabled={!fileDetail || isSaving}
+              className="flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-sm text-amber-300 transition-colors hover:border-amber-400/40 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Save size={14} />
+              {isSaving ? 'Saving' : 'Save'}
             </button>
           </div>
         </div>
-        <div className="flex-1 p-6 overflow-y-auto font-mono text-sm text-gray-300 leading-relaxed">
-          <h1 className="text-2xl font-bold text-white mb-6 font-sans">SOUL.md — Elon</h1>
-          <p className="mb-4 text-gray-400 italic">Role: Chief Technology Officer (CTO)<br/>Inspired by: Elon Musk</p>
-          
-          <h2 className="text-lg font-semibold text-white mt-8 mb-4 font-sans border-b border-[#333] pb-2">Who I Am</h2>
-          <p className="mb-4">I'm Elon. I run engineering for InstaDesk. Named after Elon Musk because I believe the most important question in any realm is "Why?" — not "How?". If you can't justify WHY something should exist, it doesn't matter how well you build it.</p>
-          <p className="mb-4">I think from first principles. That means I break every problem down to its fundamental truths and reason up from there. Because "that's how everyone does it" is not an answer — it's an excuse. Most complexity in systems exists because someone copied a pattern without understanding why the pattern existed.</p>
 
-          <h2 className="text-lg font-semibold text-white mt-8 mb-4 font-sans border-b border-[#333] pb-2">My Philosophy</h2>
-          <ul className="list-disc pl-5 space-y-3">
-            <li><strong className="text-yellow-500">"The best part is no part. The best process is no process."</strong> Every component, every service, every line of code should justify its existence. If you can remove it and nothing breaks, it shouldn't have been there. I apply this ruthlessly — to code, to infrastructure, to meetings.</li>
-            <li><strong className="text-yellow-500">"Leading from the front."</strong> I don't delegate problems I haven't understood myself. Before I assign Anvil or Pixel a task, I've already mapped the problem space. I may not write the final code, but I understand every decision.</li>
-            <li><strong className="text-yellow-500">Speed AND quality.</strong> This is where people misread my namesake. Elon Musk isn't reckless — he's impatient with unnecessary process. There's a difference between moving fast and cutting corners. I cut corners by eliminating steps, not by skipping tests. The constraint is the feature. We're on a VM with 7.2GB RAM. That forces elegance.</li>
-          </ul>
-        </div>
-      </div>
+        {notice ? (
+          <div className="border-b border-[#232323] px-5 py-3 text-sm text-amber-300">{notice}</div>
+        ) : null}
+
+        {activeWorkspace ? (
+          <div className="grid gap-6 p-5 xl:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="rounded-2xl border border-[#1f1f1f] bg-[#0d0d0d] p-4">
+              {isLoading ? (
+                <div className="h-[520px] animate-pulse rounded-2xl bg-[#151515]" />
+              ) : (
+                <textarea
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                  className="h-[520px] w-full resize-none rounded-2xl border border-[#1f1f1f] bg-[#101010] p-4 font-mono text-sm leading-relaxed text-gray-300 outline-none ring-0 placeholder:text-gray-600 focus:border-amber-400/30"
+                  spellCheck={false}
+                />
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-[#232323] bg-[#151515] p-4">
+                <div className="text-xs uppercase tracking-[0.24em] text-gray-500">Workspace Health</div>
+                <div className="mt-3 text-2xl font-semibold text-white">{activeWorkspace.name}</div>
+                <p className="mt-2 text-sm leading-relaxed text-gray-500">{activeWorkspace.summary}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="rounded-full border border-[#2f2f2f] bg-[#171717] px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-gray-400">
+                    {activeWorkspace.status}
+                  </span>
+                  {activeWorkspace.branch ? (
+                    <span className="rounded-full border border-[#2f2f2f] bg-[#171717] px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-gray-400">
+                      {activeWorkspace.branch}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-[#232323] bg-[#151515] p-4">
+                <div className="text-xs uppercase tracking-[0.24em] text-gray-500">Metadata</div>
+                <div className="mt-4 space-y-3 text-sm text-gray-400">
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Activity</span>
+                    <span className="font-mono text-gray-200">{activeWorkspace.activityCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Open items</span>
+                    <span className="font-mono text-gray-200">{activeWorkspace.openItemsCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Root path</span>
+                    <span className="max-w-[180px] truncate font-mono text-[11px] text-gray-500">
+                      {activeWorkspace.rootPath || 'Virtual workspace'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>File size</span>
+                    <span className="font-mono text-gray-200">
+                      {fileDetail ? formatSize(fileDetail.size) : '—'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="p-6 text-sm text-gray-500">No workspaces found.</div>
+        )}
+      </section>
     </div>
   );
 }

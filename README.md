@@ -1,16 +1,17 @@
 # Multi-Agents Dashboard
 
-Mission-control style frontend for managing an AI agent team inspired by the reference video and screenshots.
+Functional mission control for an OpenClaw-style AI team.
 
-This repo is the UI prototype layer for a dark command-center dashboard with five main surfaces:
+This project started from the original frontend prototype inspired by the reference video and screenshots, and is now wired into a real app architecture:
 
-- `Task Manager`
-- `Org Chart`
-- `Standup`
-- `Workspace`
-- `Docs`
-
-It is built with `React + TypeScript + Vite` and focuses on the operator experience: seeing the fleet, reviewing standups, browsing agent workspaces, and navigating living documentation from one place.
+- `React 19 + Vite` frontend
+- `Express` mission-control server
+- `SQLite` cache + audit store
+- `OpenClaw` workspace adapter
+- standup/job runners
+- workspace file editor
+- docs timeline
+- optional `Edge TTS` audio generation
 
 ## Screenshots
 
@@ -24,150 +25,71 @@ It is built with `React + TypeScript + Vite` and focuses on the operator experie
   <img src="./docs/readme/meeting-archive.png" alt="Meeting Archive" width="48%" />
 </p>
 
-## What is in this repo
-
-This repository currently contains the frontend dashboard experience, including:
-
-- A dark mission-control shell with sidebar navigation and top tabs
-- A `Task Manager` view with KPI cards, model fleet, active sessions, cron monitor, and overnight logs
-- An `Org Chart` view for chiefs, departments, agents, models, and market filters
-- A `Standup` view with archive mode, meeting detail, transcript playback UI, and deliverable/task panels
-- A `Workspace` explorer for agent memory files like `SOUL.md`, `IDENTITY.md`, `USER.md`, `TOOLS.md`, `AGENTS.md`, and `MEMORY.md`
-- A `Docs` section that explains the architecture and operating model
-
-## What each section does
+## What works now
 
 ### Task Manager
 
-The Task Manager is the main operating screen. It shows:
-
-- Top-level metrics such as active agents, idle agents, tokens used, and total cost
-- Model fleet cards for the reasoning stack
-- Active sessions with recent logs, tokens, and spend
-- Cron monitor jobs for community, research, and ops automations
-- Overnight log items summarizing what agents built or improved
-
-This is the best place to start when you want a quick snapshot of the whole system.
+- Live KPI cards from SQLite-backed mission state
+- Model fleet cards
+- Session feed with logs, token counts, and spend
+- Cron/job monitor with manual trigger buttons
+- Overnight log pulled from docs + generated artifacts
 
 ### Org Chart
 
-The Org Chart visualizes the agent team structure:
-
-- Chiefs by function like sales, dev, customer success, marketing, and finance
-- Each department’s supporting agents
-- Model assignments
-- Market filters for `MX`, `USA`, or all markets
-- Expand/collapse controls for deeper inspection
-
-This view helps explain how the team is organized and what each lane owns.
+- Role lanes and agent hierarchy from mission data
+- Chiefs, direct reports, workspace ownership, model assignment
+- Quick actions to jump into workspace, docs, or standup views
 
 ### Standup
 
-The Standup screen is designed to simulate executive briefings between agent chiefs.
-
-It includes:
-
-- Meeting archive cards
-- Detailed transcript view
-- Playback controls
-- Task checklist / action items
-- Deliverable detail panels
-
-In this frontend version, playback is powered by the browser Speech Synthesis API when available, which makes the demo feel closer to a real multi-agent conversation review flow.
+- Meeting archive backed by the database
+- Create and run new standups from the UI
+- Transcript generation and artifact persistence
+- Playback state endpoint
+- Audio playback when `edge-tts` is available
+- Browser voice fallback when generated audio is not available
 
 ### Workspace
 
-The Workspace tab acts like an internal knowledge and memory browser for each agent/workspace.
-
-It lets you navigate:
-
-- Different workspaces
-- Key markdown files
-- A document-style content pane for reading agent identity and operating instructions
-
-This area is useful for showing how agent memory and internal docs might be surfaced in the dashboard.
+- Workspace index from the adapter/cache
+- File list per workspace
+- Real file loading
+- Real file saving
+- Markdown saves are re-indexed into the docs timeline
 
 ### Docs
 
-The Docs section is the living documentation surface.
+- Timeline of living docs + overnight logs
+- Filter by doc type and workspace
+- Preview of the indexed markdown body
 
-It explains:
+## Architecture
 
-- What the dashboard is
-- The broader architecture
-- Agent framework concepts
-- Memory system ideas
-- Deployment assumptions
+### Frontend
 
-## Tech stack
+The UI lives in `src/` and talks to the local mission server through `/api/mission/*`.
 
-- `React 19`
-- `TypeScript`
-- `Vite`
-- `Tailwind CSS`
-- `lucide-react`
-- `motion`
+### Backend
 
-The `package.json` also includes `express`, `dotenv`, `better-sqlite3`, and `@google/genai`, which suggests the project is prepared to evolve into a fuller app with server-side integrations.
+The backend lives in `server/` and provides:
 
-## How to run locally
+- sync from OpenClaw-style filesystem sources
+- fixture fallback when the live workspace is incomplete
+- SQLite persistence for agents, models, sessions, jobs, meetings, docs, workspaces, and sync state
+- mission runners for standups and manual job triggers
+- audio generation hooks for `edge-tts`
 
-### Prerequisites
+### Shared contracts
 
-- `Node.js 18+` recommended
-
-### Install dependencies
-
-```bash
-npm install
-```
-
-### Configure environment variables
-
-This repo ships with a minimal `.env.example` oriented around AI Studio / Gemini:
-
-```bash
-cp .env.example .env.local
-```
-
-Then set:
-
-- `GEMINI_API_KEY`
-- `APP_URL`
-
-If you are only testing the UI and not wiring AI features yet, the dashboard layout itself can still be explored locally after install.
-
-### Start development server
-
-```bash
-npm run dev
-```
-
-By default Vite runs on:
-
-```text
-http://localhost:3000
-```
-
-## Build for production
-
-```bash
-npm run build
-```
-
-Preview the production build locally:
-
-```bash
-npm run preview
-```
+The client and server both use the types in `shared/mission.ts`.
 
 ## Project structure
 
 ```text
 src/
   App.tsx
-  main.tsx
-  index.css
+  lib/api.ts
   components/
     Sidebar.tsx
     TopNav.tsx
@@ -176,32 +98,139 @@ src/
     Standup.tsx
     Workspace.tsx
     Docs.tsx
+
+server/
+  index.ts
+  lib/
+    db.ts
+    migrations.ts
+    fixture.ts
+    openclaw.ts
+    service.ts
+  types/
+    better-sqlite3.d.ts
+
+shared/
+  mission.ts
 ```
 
-## How it works
+## Environment variables
 
-At the moment, the dashboard is mostly a polished frontend prototype with curated mock data that represents how a real agent mission control would behave.
+Copy `.env.example` to `.env` or `.env.local` and configure what you need.
 
-That means:
+Core mission-control variables:
 
-- The views are already designed and navigable
-- The standup interactions and archive flow are present in the UI
-- The workspace and docs concepts are represented visually
-- The task manager demonstrates the operating model and visual hierarchy
+- `PORT=8787`
+- `APP_URL=http://localhost:3000`
+- `DATABASE_PATH=./data/mission-control.db`
+- `OPENCLAW_WORKSPACE_PATH=`
+- `OPENCLAW_GATEWAY_URL=`
+- `OPENCLAW_GATEWAY_TOKEN=`
+- `OPENCLAW_MEMORY_DB_PATH=`
+- `MISSION_DOCS_ROOT=./data/mission-docs`
+- `MISSION_AUDIO_OUTPUT_PATH=./data/mission-audio`
+- `EDGE_TTS_VOICE_MAP={"default":"en-US-AndrewNeural"}`
+- `MISSION_REFRESH_INTERVAL_MS=300000`
 
-The next step, if you want to keep evolving this repo, would be wiring these views to real APIs or a backend mission runner so the dashboard becomes live instead of demo-driven.
+Notes:
 
-## Intended use
+- If `OPENCLAW_WORKSPACE_PATH` points to a real workspace, the adapter will try to read models, jobs, org chart, docs, and workspace files.
+- If the workspace is incomplete or missing, the app falls back to the built-in mission fixture so the dashboard still works.
+- `EDGE_TTS_VOICE_MAP` is optional. If `edge-tts` is not installed, standups still run and the UI falls back to browser speech.
 
-This repo is ideal if you want to:
+## Local development
 
-- Demo the concept of a multi-agent mission control dashboard
-- Use the UI as a starting point for a real OpenClaw or custom agent backend
-- Recreate the command-center look and feel from the reference material
-- Build a founder/operator cockpit for AI teams
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start both frontend and backend:
+
+```bash
+npm run dev
+```
+
+That launches:
+
+- Vite client on `http://localhost:3000`
+- Express server on `http://localhost:8787`
+
+The Vite dev server proxies `/api` calls to the backend automatically.
+
+## Production build
+
+Build client + server:
+
+```bash
+npm run build
+```
+
+Start the compiled server:
+
+```bash
+npm run start
+```
+
+The production server serves both the built frontend and the mission APIs.
+
+## API surfaces
+
+Implemented endpoints:
+
+- `GET /api/mission/summary`
+- `GET /api/mission/sessions`
+- `GET /api/mission/jobs`
+- `POST /api/mission/jobs/:id/trigger`
+- `GET /api/mission/meetings`
+- `POST /api/mission/meetings`
+- `GET /api/mission/meetings/:id`
+- `POST /api/mission/meetings/:id/run`
+- `GET /api/mission/meetings/:id/playback`
+- `GET /api/mission/org-chart`
+- `GET /api/mission/workspaces`
+- `GET /api/mission/workspaces/:id/file?fileId=...`
+- `PUT /api/mission/workspaces/:id/file?fileId=...`
+- `GET /api/mission/docs`
+- `POST /api/mission/sync`
+
+## OpenClaw adapter behavior
+
+The adapter currently looks for filesystem-style sources such as:
+
+- `.openclaw/openclaw.json`
+- `agents/main/agent/models.json`
+- `.openclaw/cron/jobs.json`
+- `org-chart.json`
+- `.openclaw/org-chart.json`
+- `agents.json`
+- markdown docs under the workspace or configured docs root
+
+When those sources are found, they are normalized and cached in SQLite.
+
+## Data flow
+
+1. The UI requests `/api/mission/*`.
+2. The server ensures the cache is fresh.
+3. `server/lib/openclaw.ts` loads live workspace data or falls back to `server/lib/fixture.ts`.
+4. `server/lib/service.ts` writes the normalized snapshot into SQLite.
+5. The UI renders the cached mission state and can trigger new standups/jobs.
+6. Generated artifacts are written to disk and also indexed back into the docs timeline.
+
+## Standup runner
+
+When you create and run a standup:
+
+1. A meeting row is created in SQLite.
+2. A runner session is created in the session feed.
+3. The mission runner generates meeting turns.
+4. Action items and playbook artifacts are written as markdown files.
+5. Those artifacts are inserted into `doc_entries`.
+6. If `edge-tts` works, an `.mp3` is created and exposed through the playback endpoint.
 
 ## Notes
 
-- This repo is the frontend prototype version of the dashboard concept.
-- The more complete full-stack implementation can live in a separate production repo if you connect it to auth, SQLite, cron jobs, TTS, and real OpenClaw workspace state.
-- The screenshots included here come from the reference captures you shared and are now embedded directly into the repo for GitHub presentation.
+- This repo is no longer just a UI mock. It now contains the full mission-control app shell, server, data layer, and runners.
+- The OpenClaw adapter is intentionally filesystem-first so it can live in the same Ubuntu VM as the agent workspace.
+- If your exact workspace structure differs from the current adapter assumptions, extend `server/lib/openclaw.ts` with your real paths and formats.

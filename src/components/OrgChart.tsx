@@ -1,392 +1,291 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Check, Circle, X, Sparkles } from 'lucide-react';
+import { FolderOpen, Mic, Network, ScrollText } from 'lucide-react';
+import { useState } from 'react';
 
-const orgStats = [
-  { label: 'Chiefs', value: '5', color: 'text-yellow-500', border: 'border-yellow-500/30' },
-  { label: 'Total Agents', value: '18', color: 'text-white', border: 'border-white/20' },
-  { label: 'Active', value: '15', color: 'text-green-500', border: 'border-green-500/30', icon: <Check size={16} className="text-green-500 inline mr-1" /> },
-  { label: 'Scaffolded', value: '3', color: 'text-yellow-500', border: 'border-yellow-500/30', icon: <Circle size={12} fill="currentColor" className="text-yellow-500 inline mr-1" /> },
-  { label: 'Deprecated', value: '0', color: 'text-green-500', border: 'border-green-500/30', icon: <Check size={16} className="text-green-500 inline mr-1" /> },
-];
+import type { AgentProfile, OrgChartPayload } from '../../shared/mission';
 
-const orgData = [
-  {
-    id: 'sales',
-    chiefName: 'CRO AI',
-    chiefModel: 'Claude Sonnet 4.6',
-    chiefRole: 'Ventas',
-    chiefColor: 'border-t-[#7F77DD]',
-    chiefEmoji: '💼',
-    description: 'Pipeline de adquisición MX + USA',
-    departments: [
-      {
-        id: 'sales-0',
-        title: 'Ventas',
-        description: 'Pipeline de adquisición MX + USA',
-        agents: [
-          { name: 'The Lead Hunter', role: 'Scraping y calificación de leads', emoji: '🔍', status: 'Active', models: ['Gemini Lite'], frequency: 'Cada 6h', markets: ['MX', 'USA'], isLLM: true },
-          { name: 'The Demo Crafter', role: 'Scripts y propuestas por industria', emoji: '📝', status: 'Active', models: ['Gemini Flash'], frequency: 'Batch nocturno', markets: ['MX', 'USA'], isLLM: true },
-          { name: 'The Sales Closer', role: 'Negociación y manejo de objeciones', emoji: '🤝', status: 'Active', models: ['Claude Sonnet'], frequency: 'Reactivo', markets: ['MX', 'USA'], isLLM: true },
-          { name: 'The Follow-Up Agent', role: 'Seguimiento de leads fríos', emoji: '📞', status: 'Active', models: ['Gemini Lite'], frequency: 'Diario', markets: ['MX', 'USA'], isLLM: true }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'dev',
-    chiefName: 'CTO AI',
-    chiefModel: 'Claude Sonnet 4.6',
-    chiefRole: 'Dev & Infraestructura',
-    chiefColor: 'border-t-[#1D9E75]',
-    chiefEmoji: '⚙️',
-    description: 'Construcción, automatización y estabilidad del sistema',
-    departments: [
-      {
-        id: 'dev-0',
-        title: 'Dev & Infraestructura',
-        description: 'Construcción, automatización y estabilidad del sistema',
-        agents: [
-          { name: 'Workflow Engineer', role: 'Automaciones n8n y workflows', emoji: '🔄', status: 'Active', models: ['Claude Sonnet'], frequency: 'Bajo demanda', isLLM: true },
-          { name: 'The Web Builder', role: 'Landing pages y assets digitales', emoji: '🌐', status: 'Active', models: ['Claude Sonnet'], frequency: 'Bajo demanda', isLLM: true },
-          { name: 'The QA Pro', role: 'Testing y regression post-deploy', emoji: '🛡️', status: 'Active', models: ['Gemini Flash'], frequency: 'Post-deploy', isLLM: true },
-          { name: 'The SRE', role: 'Monitoreo de servicios 24/7', emoji: '📈', status: 'Active', models: ['Gemini Lite'], frequency: 'Cada 30 min', isLLM: true },
-          { name: 'The Systems Medic', role: 'Diagnóstico y respuesta incidentes', emoji: '🚑', status: 'Active', models: ['Claude Sonnet'], frequency: 'Reactivo', isLLM: true },
-          { name: 'Security Module', role: 'Auditoría y checks de seguridad', emoji: '🔒', status: 'Scaffolded', models: ['— (sin LLM)'], frequency: 'n8n cron', isLLM: false }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'cs',
-    chiefName: 'CCO AI',
-    chiefModel: 'Gemini Flash',
-    chiefRole: 'Customer Success',
-    chiefColor: 'border-t-[#378ADD]',
-    chiefEmoji: '🎧',
-    description: 'Onboarding, soporte y retención de clientes activos',
-    departments: [
-      {
-        id: 'cs-0',
-        title: 'Customer Success',
-        description: 'Onboarding, soporte y retención de clientes activos',
-        agents: [
-          { name: 'The Router', role: 'Clasificación y enrutamiento tickets', emoji: '🔀', status: 'Active', models: ['Gemini Flash'], frequency: 'Tiempo real', markets: ['MX', 'USA'], isLLM: true },
-          { name: 'The Guide', role: 'Onboarding de clientes nuevos', emoji: '🗺️', status: 'Active', models: ['Gemini Flash'], frequency: '×4 por cliente', markets: ['MX', 'USA'], isLLM: true },
-          { name: 'The CS Agent', role: 'Soporte, retención y escalaciones', emoji: '💬', status: 'Active', models: ['Claude Sonnet'], frequency: '×10 por cliente', markets: ['MX', 'USA'], isLLM: true }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'marketing',
-    chiefName: 'CMO AI',
-    chiefModel: 'Gemini Flash',
-    chiefRole: 'Marketing & Contenido',
-    chiefColor: 'border-t-[#D85A30]',
-    chiefEmoji: '📣',
-    description: 'Copy, posicionamiento e inteligencia de mercado',
-    departments: [
-      {
-        id: 'marketing-0',
-        title: 'Marketing & Contenido',
-        description: 'Copy, posicionamiento e inteligencia de mercado',
-        agents: [
-          { name: 'The Copywriter', role: 'Copy, propuestas, LinkedIn, FAQ', emoji: '✍️', status: 'Active', models: ['Gemini Flash'], frequency: 'Bajo demanda', markets: ['MX', 'USA'], isLLM: true },
-          { name: 'The Market Scout', role: 'Inteligencia competitiva', emoji: '🕵️', status: 'Active', models: ['Gemini Lite'], frequency: 'Semanal', markets: ['MX', 'USA'], isLLM: true }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'finance',
-    chiefName: 'CFO AI',
-    chiefModel: 'Gemini Flash',
-    chiefRole: 'Finance & Analytics',
-    chiefColor: 'border-t-[#BA7517]',
-    chiefEmoji: '📊',
-    description: 'Revenue, métricas y control de costos',
-    departments: [
-      {
-        id: 'finance-0',
-        title: 'Finance & Analytics',
-        description: 'Revenue, métricas y control de costos',
-        agents: [
-          { name: 'The Analyst', role: 'P&L · MRR · KPIs · Reporte a CEO', emoji: '📈', status: 'Active', models: ['Gemini Flash'], frequency: 'Diario', isLLM: true },
-          { name: 'Analytics Pipeline', role: 'SQL, métricas y dashboards automáticos', emoji: '⚙️', status: 'Scaffolded', models: ['— (sin LLM)'], frequency: 'Cron diario', isLLM: false },
-          { name: 'Token Monitor', role: 'Alertas de costo API en tiempo real', emoji: '🪙', status: 'Scaffolded', models: ['— (sin LLM)'], frequency: 'Webhook RT', isLLM: false }
-        ]
-      }
-    ]
-  }
-];
+interface OrgChartProps {
+  payload: OrgChartPayload | null;
+  onOpenWorkspace: (workspaceId: string | null | undefined) => void;
+  onOpenDocs: (workspaceId: string | null | undefined) => void;
+  onOpenStandup: () => void;
+}
 
-const allDeptIds = orgData.flatMap(chief => chief.departments.map(d => d.id));
+function borderTint(color: string) {
+  if (color === '#5DCAA5') return 'border-emerald-400/30';
+  if (color === '#60A5FA') return 'border-sky-400/30';
+  if (color === '#A855F7') return 'border-violet-400/30';
+  if (color === '#FBBF24') return 'border-amber-400/30';
+  return 'border-[#2e2e2e]';
+}
 
-export default function OrgChart() {
-  const [expanded, setExpanded] = useState<string[]>([]);
-  const [marketFilter, setMarketFilter] = useState<'ALL' | 'MX' | 'USA'>('ALL');
+function glowTint(color: string) {
+  if (color === '#5DCAA5') return 'shadow-[0_0_24px_rgba(93,202,165,0.08)]';
+  if (color === '#60A5FA') return 'shadow-[0_0_24px_rgba(96,165,250,0.08)]';
+  if (color === '#A855F7') return 'shadow-[0_0_24px_rgba(168,85,247,0.08)]';
+  if (color === '#FBBF24') return 'shadow-[0_0_24px_rgba(251,191,36,0.08)]';
+  return '';
+}
 
-  const toggle = (id: string) => {
-    setExpanded(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  };
+function statusClass(status: AgentProfile['status']) {
+  if (status === 'active' || status === 'running') return 'bg-green-500';
+  if (status === 'scaffolded' || status === 'queued') return 'bg-yellow-500';
+  if (status === 'inactive' || status === 'error') return 'bg-rose-500';
+  return 'bg-gray-500';
+}
 
-  const expandAll = () => setExpanded(allDeptIds);
-  const collapseAll = () => setExpanded([]);
-
+function AgentCard({
+  agent,
+  reports,
+  onOpenWorkspace,
+  onOpenDocs,
+  onOpenStandup,
+}: {
+  agent: AgentProfile;
+  reports: AgentProfile[];
+  onOpenWorkspace: (workspaceId: string | null | undefined) => void;
+  onOpenDocs: (workspaceId: string | null | undefined) => void;
+  onOpenStandup: () => void;
+}) {
   return (
-    <div className="max-w-[1200px] mx-auto space-y-8 pb-12 bg-grid min-h-full p-4 rounded-xl">
-      <div className="flex justify-between items-end mb-8">
+    <div className={`rounded-3xl border bg-[#111111] p-5 ${borderTint(agent.color)} ${glowTint(agent.color)}`}>
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold mb-1">Organization Chart</h2>
-          <p className="text-sm text-gray-500">InstaDesk - Operational Structure</p>
+          <div className="mb-3 flex items-center gap-3">
+            <div
+              className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-2xl"
+              style={{ boxShadow: `0 0 20px ${agent.color}20` }}
+            >
+              {agent.emoji}
+            </div>
+            <div>
+              <div className="text-lg font-semibold text-white">{agent.name}</div>
+              <div className="text-xs uppercase tracking-[0.24em] text-gray-500">
+                {agent.metadata.chiefTitle ? String(agent.metadata.chiefTitle) : agent.roleSlug}
+              </div>
+            </div>
+          </div>
+          <p className="text-sm leading-relaxed text-gray-500">{agent.persona}</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={expandAll} className="px-4 py-1.5 bg-[#1a1a1a] border border-[#333] text-sm rounded-md hover:bg-[#222] transition-colors">Expand All</button>
-          <button onClick={collapseAll} className="px-4 py-1.5 bg-[#1a1a1a] border border-[#333] text-sm rounded-md hover:bg-[#222] transition-colors">Collapse All</button>
+
+        <div className="flex items-center gap-2 rounded-full border border-[#2f2f2f] bg-[#151515] px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-gray-400">
+          <span className={`h-2 w-2 rounded-full ${statusClass(agent.status)}`} />
+          {agent.status}
         </div>
       </div>
 
-      <div className="grid grid-cols-5 gap-4 mb-12">
-        {orgStats.map((stat, i) => (
-          <div key={i} className={`bg-[#111111] border ${stat.border} rounded-xl p-4 flex flex-col items-center justify-center shadow-lg`}>
-            <span className={`text-3xl font-bold mb-1 ${stat.color}`}>
-              {stat.icon}{stat.value}
-            </span>
-            <span className="text-xs text-gray-400 uppercase tracking-wider">{stat.label}</span>
-          </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {agent.modelKey ? (
+          <span className="rounded-full border border-[#2f2f2f] bg-[#171717] px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-gray-300">
+            {agent.modelKey}
+          </span>
+        ) : null}
+        {agent.frequency ? (
+          <span className="rounded-full border border-[#2f2f2f] bg-[#171717] px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-gray-400">
+            {agent.frequency}
+          </span>
+        ) : null}
+        {agent.markets.map((market) => (
+          <span
+            key={market}
+            className="rounded-full border border-[#2f2f2f] bg-[#171717] px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-gray-400"
+          >
+            {market}
+          </span>
         ))}
       </div>
 
-      {/* Market Filter */}
-      <div className="flex justify-center gap-3 mb-10">
-        <button 
-          onClick={() => setMarketFilter('ALL')}
-          className={`px-4 py-1.5 rounded-md text-xs font-bold border transition-colors ${marketFilter === 'ALL' ? 'bg-gray-200/20 text-gray-200 border-gray-200/30' : 'bg-[#1a1a1a] text-gray-500 border-[#333] hover:border-gray-500'}`}
+      <div className="mt-5 flex flex-wrap gap-2">
+        <button
+          onClick={() => onOpenWorkspace(agent.workspaceId)}
+          className="flex items-center gap-2 rounded-lg border border-[#2d2d2d] bg-[#171717] px-3 py-2 text-sm text-gray-300 transition-colors hover:border-amber-500/30 hover:text-white"
         >
-          All Markets
+          <FolderOpen size={14} />
+          Workspace
         </button>
-        <button 
-          onClick={() => setMarketFilter('MX')}
-          className={`px-4 py-1.5 rounded-md text-xs font-bold border transition-colors ${marketFilter === 'MX' ? 'bg-green-500/20 text-green-500 border-green-500/30' : 'bg-[#1a1a1a] text-gray-500 border-[#333] hover:border-green-500/50'}`}
+        <button
+          onClick={() => onOpenDocs(agent.workspaceId)}
+          className="flex items-center gap-2 rounded-lg border border-[#2d2d2d] bg-[#171717] px-3 py-2 text-sm text-gray-300 transition-colors hover:border-amber-500/30 hover:text-white"
         >
-          MX
+          <ScrollText size={14} />
+          Docs
         </button>
-        <button 
-          onClick={() => setMarketFilter('USA')}
-          className={`px-4 py-1.5 rounded-md text-xs font-bold border transition-colors ${marketFilter === 'USA' ? 'bg-blue-500/20 text-blue-500 border-blue-500/30' : 'bg-[#1a1a1a] text-gray-500 border-[#333] hover:border-blue-500/50'}`}
+        <button
+          onClick={onOpenStandup}
+          className="flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-sm text-amber-300 transition-colors hover:border-amber-400/40"
         >
-          USA
+          <Mic size={14} />
+          Standup
         </button>
       </div>
 
-      <div className="flex flex-col items-center">
-        {/* Human */}
-        <div className="relative flex flex-col items-center">
-          <div className="bg-[#1a1a1a] border border-yellow-500/30 rounded-xl p-4 w-72 text-center relative z-10 shadow-[0_0_15px_rgba(234,179,8,0.1)] hover:border-yellow-500/60 transition-colors cursor-pointer">
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-yellow-500 font-bold tracking-widest">Human CEO</div>
-            <div className="w-12 h-12 bg-blue-500/20 rounded-full mx-auto mb-2 mt-3 flex items-center justify-center text-2xl">👨🏻‍💻</div>
-            <h3 className="font-semibold text-gray-200">Mijito</h3>
-            <p className="text-xs text-gray-500 mt-1">Visión · Aprobaciones finales · Cierre de ventas clave</p>
-          </div>
-          <div className="w-px h-6 bg-yellow-500/50"></div>
-          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-          <div className="w-px h-6 bg-yellow-500/50"></div>
-        </div>
-
-        {/* COO */}
-        <div className="relative flex flex-col items-center">
-          <div className="bg-[#0a1f14] border border-[#5DCAA5]/30 rounded-xl p-4 w-80 text-center relative z-10 shadow-[0_0_15px_rgba(93,202,165,0.1)] hover:border-[#5DCAA5]/60 transition-colors cursor-pointer">
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-[#5DCAA5] font-bold tracking-widest">Chief of Staff / AI Orchestrator</div>
-            <div className="w-12 h-12 bg-[#5DCAA5]/20 rounded-full mx-auto mb-2 mt-3 flex items-center justify-center text-2xl">🔵</div>
-            <h3 className="font-semibold text-gray-200">COO AI</h3>
-            <p className="text-xs text-gray-500 mt-1">Delegación · Coordinación C-Suite · Reporte semanal</p>
-            <div className="mt-2 flex justify-center gap-2 flex-wrap">
-              <ModelBadge model="Claude Sonnet 4.6" />
-            </div>
-          </div>
-          <div className="w-px h-6 bg-yellow-500/50"></div>
-          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-          <div className="w-px h-6 bg-yellow-500/50"></div>
-        </div>
-
-        {/* THE STRATEGIST (Direct Report) */}
-        <div className="relative flex flex-col items-center">
-          <div className="bg-[#111111] border-2 border-dashed border-[#5DCAA5]/50 rounded-xl p-4 w-72 text-center relative z-10 shadow-[0_0_15px_rgba(93,202,165,0.1)] hover:border-[#5DCAA5]/80 transition-colors cursor-pointer">
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-[#5DCAA5] font-bold tracking-widest">Direct Report</div>
-            <div className="w-10 h-10 bg-[#5DCAA5]/20 rounded-full mx-auto mb-2 mt-3 flex items-center justify-center text-xl">♟️</div>
-            <h3 className="font-semibold text-gray-200">THE STRATEGIST</h3>
-            <p className="text-xs text-gray-400 mt-1">Estrategia & Roadmap</p>
-            <div className="mt-2 flex justify-center gap-2 flex-wrap">
-              <ModelBadge model="Claude Sonnet 4.6" />
-              <span className="text-[10px] px-1.5 py-0.5 rounded-md border bg-gray-800/50 text-gray-400 border-gray-700/50">Semanal + demanda</span>
-            </div>
-          </div>
-          <div className="w-px h-6 bg-yellow-500/50"></div>
-          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
-          <div className="w-px h-6 bg-yellow-500/50"></div>
-        </div>
-
-        <div className="w-[1100px] h-px bg-yellow-500/50"></div>
-
-        {/* Chiefs */}
-        <div className="flex justify-between w-[1150px] mt-0 gap-4">
-          {orgData.map((chief) => (
-            <div key={chief.id} className="flex-1 flex flex-col items-center">
-              <div className="w-px h-6 bg-yellow-500/50 mb-0"></div>
-              <div className={`bg-[#111111] border-t-2 ${chief.chiefColor} border-x border-b border-[#333] rounded-xl p-4 w-full mb-4 shadow-lg hover:border-gray-500/50 transition-colors cursor-pointer`}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="text-3xl">{chief.chiefEmoji}</div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-lg text-gray-200">{chief.chiefName}</h3>
+      {reports.length > 0 ? (
+        <div className="mt-6 space-y-3 border-t border-[#222] pt-5">
+          <div className="text-xs uppercase tracking-[0.24em] text-gray-500">Direct Reports</div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {reports.map((child) => (
+              <div key={child.id} className="rounded-2xl border border-[#252525] bg-[#151515] p-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-xl">{child.emoji}</div>
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-gray-100">{child.name}</div>
+                    <div className="mt-1 text-xs text-gray-500">{child.persona}</div>
+                    <div className="mt-3 flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.18em] text-gray-400">
+                      {child.modelKey ? (
+                        <span className="rounded-full border border-[#2d2d2d] bg-[#171717] px-2 py-1">
+                          {child.modelKey}
+                        </span>
+                      ) : null}
+                      {child.workspaceId ? (
+                        <span className="rounded-full border border-[#2d2d2d] bg-[#171717] px-2 py-1">
+                          {child.workspaceId}
+                        </span>
+                      ) : null}
                     </div>
-                    <div className="text-[10px] text-yellow-500 font-bold tracking-widest mt-0.5">{chief.chiefRole}</div>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed mb-3">{chief.description}</p>
-                <ModelBadge model={chief.chiefModel} />
               </div>
-              
-              <div className="w-full space-y-3">
-                {chief.departments.map(dept => (
-                  <Department key={dept.id} {...dept} isExpanded={expanded.includes(dept.id)} onToggle={toggle} marketFilter={marketFilter} />
-                ))}
-              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export default function OrgChart({
+  payload,
+  onOpenWorkspace,
+  onOpenDocs,
+  onOpenStandup,
+}: OrgChartProps) {
+  const [marketFilter, setMarketFilter] = useState<'ALL' | 'MX' | 'USA'>('ALL');
+
+  if (!payload) {
+    return (
+      <div className="mx-auto max-w-6xl p-6">
+        <div className="h-12 w-72 animate-pulse rounded-xl bg-[#1d1d1d]" />
+      </div>
+    );
+  }
+
+  const filteredAgents = payload.agents.filter((agent) => {
+    if (marketFilter === 'ALL') {
+      return true;
+    }
+    return agent.markets.includes(marketFilter);
+  });
+
+  const filteredIds = new Set(filteredAgents.map((agent) => agent.id));
+  const roots = filteredAgents.filter((agent) => !agent.chiefId || !filteredIds.has(agent.chiefId));
+  const directReports = roots.flatMap((root) =>
+    filteredAgents.filter((agent) => agent.chiefId === root.id)
+  );
+
+  const activeCount = filteredAgents.filter((agent) => agent.status === 'active').length;
+  const scaffoldedCount = filteredAgents.filter((agent) => agent.status === 'scaffolded').length;
+
+  return (
+    <div className="mx-auto max-w-6xl space-y-8 rounded-3xl bg-grid pb-12">
+      <div className="rounded-3xl border border-[#232323] bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.08),transparent_35%),#101010] p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="mb-2 text-xs uppercase tracking-[0.28em] text-gray-500">Org Chart</div>
+            <h2 className="text-3xl font-semibold text-white">Chief hierarchy and workspace ownership</h2>
+            <p className="mt-2 max-w-2xl text-sm text-gray-500">
+              Inspect the chain of command, assigned models, frequency loops, and quick links back into
+              workspaces, standups, and docs.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {(['ALL', 'MX', 'USA'] as const).map((market) => (
+              <button
+                key={market}
+                onClick={() => setMarketFilter(market)}
+                className={`rounded-full border px-3 py-2 text-xs uppercase tracking-[0.2em] transition-colors ${
+                  marketFilter === market
+                    ? 'border-amber-400/40 bg-amber-500/10 text-amber-300'
+                    : 'border-[#2f2f2f] bg-[#171717] text-gray-400 hover:text-gray-100'
+                }`}
+              >
+                {market === 'ALL' ? 'All Markets' : market}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-4">
+          <div className="rounded-2xl border border-[#232323] bg-[#111111] p-4">
+            <div className="text-3xl font-semibold text-white">{payload.roles.length}</div>
+            <div className="mt-1 text-xs uppercase tracking-[0.22em] text-gray-500">Roles</div>
+          </div>
+          <div className="rounded-2xl border border-[#232323] bg-[#111111] p-4">
+            <div className="text-3xl font-semibold text-white">{filteredAgents.length}</div>
+            <div className="mt-1 text-xs uppercase tracking-[0.22em] text-gray-500">Visible Agents</div>
+          </div>
+          <div className="rounded-2xl border border-[#232323] bg-[#111111] p-4">
+            <div className="text-3xl font-semibold text-green-400">{activeCount}</div>
+            <div className="mt-1 text-xs uppercase tracking-[0.22em] text-gray-500">Active</div>
+          </div>
+          <div className="rounded-2xl border border-[#232323] bg-[#111111] p-4">
+            <div className="text-3xl font-semibold text-yellow-400">{scaffoldedCount}</div>
+            <div className="mt-1 text-xs uppercase tracking-[0.22em] text-gray-500">Scaffolded</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        {roots.map((root) => {
+          const children = filteredAgents.filter((agent) => agent.chiefId === root.id);
+          const grandchildren = (agentId: string) =>
+            filteredAgents.filter((agent) => agent.chiefId === agentId);
+
+          return (
+            <div key={root.id} className="space-y-5">
+              <AgentCard
+                agent={root}
+                reports={children}
+                onOpenWorkspace={onOpenWorkspace}
+                onOpenDocs={onOpenDocs}
+                onOpenStandup={onOpenStandup}
+              />
+
+              {children.length > 0 ? (
+                <div className="grid gap-4 xl:grid-cols-2">
+                  {children.map((child) => (
+                    <div key={child.id}>
+                      <AgentCard
+                        agent={child}
+                        reports={grandchildren(child.id)}
+                        onOpenWorkspace={onOpenWorkspace}
+                        onOpenDocs={onOpenDocs}
+                        onOpenStandup={onOpenStandup}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
+          );
+        })}
+      </div>
+
+      <div className="rounded-3xl border border-[#232323] bg-[#111111] p-5">
+        <div className="mb-3 flex items-center gap-2 text-sm text-gray-400">
+          <Network size={16} />
+          Role lanes
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {payload.roles.map((role) => (
+            <span
+              key={role.slug}
+              className="rounded-full border border-[#2f2f2f] bg-[#171717] px-3 py-2 text-xs uppercase tracking-[0.18em] text-gray-300"
+              style={{ boxShadow: `inset 0 0 0 1px ${role.color}20` }}
+            >
+              {role.name}
+            </span>
           ))}
         </div>
       </div>
-
-      {/* Footer */}
-      <div className="mt-12 text-center space-y-1">
-        <p className="text-xs text-gray-500">Una empresa · Dos mercados · InstaDesk MX + RingVault USA</p>
-        <p className="text-[10px] text-gray-600">Market context inyectado por agente — lógica condicional por mercado</p>
-      </div>
-
-      {/* Legend */}
-      <div className="mt-4 bg-[#111111] border border-[#333] rounded-xl p-4">
-        <h4 className="text-xs font-bold text-gray-500 tracking-widest uppercase mb-4">Legend</h4>
-        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-400">Status:</span>
-            <StatusBadge status="Active" />
-            <StatusBadge status="Scaffolded" />
-            <StatusBadge status="Future" />
-            <StatusBadge status="Deprecated" />
-          </div>
-          <div className="w-px h-6 bg-[#333] hidden md:block"></div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-sm font-medium text-gray-400">Model:</span>
-            <ModelBadge model="Opus" />
-            <ModelBadge model="Codex" />
-            <ModelBadge model="Sonnet" />
-            <ModelBadge model="Haiku" />
-            <ModelBadge model="Gemini Flash" />
-            <ModelBadge model="Gemini Pro" />
-            <ModelBadge model="Nano Banana Pro" />
-            <ModelBadge model="Minimax" />
-            <ModelBadge model="Kimi" />
-            <ModelBadge model="Deepseek" />
-          </div>
-        </div>
-      </div>
     </div>
   );
-}
-
-function Department({ id, title, description, count, agents, isExpanded, onToggle, marketFilter }: any) {
-  return (
-    <div className="bg-[#111111] border border-[#222] rounded-xl overflow-hidden shadow-sm hover:border-yellow-500/30 transition-colors">
-      <div 
-        className="flex justify-between items-center p-3 cursor-pointer hover:bg-[#1a1a1a] transition-colors"
-        onClick={() => onToggle(id)}
-      >
-        <h4 className="text-sm font-medium text-gray-200">{title}</h4>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] text-gray-500">{agents?.length || count} agents</span>
-          {isExpanded ? <ChevronUp size={14} className="text-gray-500" /> : <ChevronDown size={14} className="text-gray-500" />}
-        </div>
-      </div>
-      
-      {isExpanded && (
-        <div className="p-3 pt-0 border-t border-[#222]">
-          {description && <p className="text-xs text-gray-500 mb-4 mt-2 leading-relaxed">{description}</p>}
-          <div className="space-y-2">
-            {agents.map((agent: any, i: number) => {
-              const isDimmed = marketFilter !== 'ALL' && (!agent.markets || !agent.markets.includes(marketFilter));
-              return (
-              <div key={i} className={`bg-[#1a1a1a] border ${agent.isLLM === false ? 'border-dashed border-gray-600/50' : 'border-[#333]'} rounded-lg p-3 hover:border-yellow-500/50 transition-all duration-300 cursor-pointer ${isDimmed ? 'opacity-30 grayscale' : 'opacity-100'}`}>
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="text-xl">{agent.emoji}</div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <div className="text-sm font-medium text-gray-200">{agent.name}</div>
-                      <MarketBadge markets={agent.markets} />
-                    </div>
-                    <div className="text-[10px] text-gray-500 mt-0.5">{agent.role}</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <StatusBadge status={agent.status} />
-                  {agent.models.map((m: string) => <ModelBadge key={m} model={m} isLLM={agent.isLLM} />)}
-                  {agent.frequency && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-md border bg-gray-800/30 text-gray-400 border-gray-700/50">
-                      {agent.frequency}
-                    </span>
-                  )}
-                </div>
-              </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function MarketBadge({ markets }: { markets?: ('MX' | 'USA')[] }) {
-  if (!markets || markets.length === 0) return null;
-  
-  if (markets.includes('MX') && markets.includes('USA')) {
-    return <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-500 border border-amber-500/30">MX · USA</span>;
-  }
-  if (markets.includes('MX')) {
-    return <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-500 border border-green-500/30">MX</span>;
-  }
-  if (markets.includes('USA')) {
-    return <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-500 border border-blue-500/30">USA</span>;
-  }
-  return null;
-}
-
-function StatusBadge({ status }: { status: string }) {
-  if (status === 'Active') return <span className="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 border border-green-500/20 px-1.5 py-0.5 rounded-md"><Check size={10} /> Active</span>;
-  if (status === 'Scaffolded') return <span className="flex items-center gap-1 text-[10px] text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 px-1.5 py-0.5 rounded-md"><Circle size={8} fill="currentColor" /> Scaffolded</span>;
-  if (status === 'Deprecated') return <span className="flex items-center gap-1 text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded-md"><X size={10} /> Deprecated</span>;
-  if (status === 'Future') return <span className="flex items-center gap-1 text-[10px] text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded-md"><Sparkles size={10} /> Future</span>;
-  return null;
-}
-
-function ModelBadge({ model, isLLM = true }: { model: string, isLLM?: boolean }) {
-  if (isLLM === false || model === '— (sin LLM)') {
-    return <span className="text-[10px] px-1.5 py-0.5 rounded-md border border-dashed bg-[#2a2a2a] text-[#9ca3af] border-gray-600/50">Sin LLM</span>;
-  }
-
-  let colorClass = 'bg-gray-500/20 text-gray-400 border-gray-700/50';
-  if (model.includes('Claude Sonnet 4.6') || model === 'Claude Sonnet') colorClass = 'bg-[#1a3a5c] text-[#60a5fa] border-blue-800/50';
-  else if (model.includes('Gemini Flash')) colorClass = 'bg-[#1a3d1f] text-[#4ade80] border-green-800/50';
-  else if (model.includes('Gemini Lite')) colorClass = 'bg-[#1a3d1f] text-[#86efac] border-green-800/50';
-  else if (model.includes('Opus')) colorClass = 'bg-orange-900/40 text-orange-400 border-orange-800/50';
-  else if (model.includes('Codex')) colorClass = 'bg-purple-900/40 text-purple-400 border-purple-800/50';
-  else if (model.includes('Sonnet')) colorClass = 'bg-teal-900/40 text-teal-400 border-teal-800/50';
-  else if (model.includes('Haiku')) colorClass = 'bg-pink-900/40 text-pink-400 border-pink-800/50';
-  else if (model.includes('Gemini Pro')) colorClass = 'bg-blue-800/40 text-blue-300 border-blue-700/50';
-  else if (model.includes('Nano Banana Pro')) colorClass = 'bg-yellow-900/40 text-yellow-400 border-yellow-800/50';
-  else if (model.includes('Minimax')) colorClass = 'bg-red-900/40 text-red-400 border-red-800/50';
-  else if (model.includes('Kimi')) colorClass = 'bg-stone-800/40 text-stone-300 border-stone-700/50';
-  else if (model.includes('Deepseek') || model.includes('DeepSeek')) colorClass = 'bg-indigo-900/40 text-indigo-400 border-indigo-800/50';
-  else if (model.includes('Qwen')) colorClass = 'bg-emerald-900/40 text-emerald-400 border-emerald-800/50';
-
-  return <span className={`text-[10px] px-1.5 py-0.5 rounded-md border ${colorClass}`}>{model}</span>;
 }
