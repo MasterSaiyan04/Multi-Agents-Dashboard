@@ -224,7 +224,7 @@ The compiled server serves both the built frontend and the mission APIs at `http
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, validation, and pull request guidelines. Track planned work in [GitHub issues](https://github.com/MasterSaiyan04/Multi-Agents-Dashboard/issues).
 
-The proposed first release and its remaining checks are documented in [the v0.1.0 release plan](docs/releases/v0.1.0.md). This plan is not a published release.
+See [the v0.1.0 development preview notes](docs/releases/v0.1.0.md) for validation results and known limitations. This pre-release is intended for local evaluation with disposable demo data.
 
 ## License
 
