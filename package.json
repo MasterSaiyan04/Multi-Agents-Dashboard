@@ -1,7 +1,8 @@
 {
   "name": "multi-agents-dashboard",
   "private": true,
-  "version": "0.0.0",
+  "license": "MIT",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "tsx scripts/dev.ts",
@@ -9,7 +10,7 @@
     "dev:server": "tsx server/index.ts",
     "build": "npm run lint && vite build && npm run build:server",
     "build:server": "tsc -p tsconfig.server.json",
-    "start": "node server-dist/index.js",
+    "start": "node server-dist/server/index.js",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit"
