@@ -24,6 +24,46 @@ This project started from the original frontend prototype inspired by the refere
 - docs timeline
 - optional `Edge TTS` audio generation
 
+## Technical walkthrough
+
+This project provides a concrete path for reviewing API handling, local persistence, configuration, and workflow tooling:
+
+| Area | Where to look | What is implemented |
+| --- | --- | --- |
+| API requests and errors | [`src/lib/api.ts`](src/lib/api.ts), [`server/index.ts`](server/index.ts) | Typed client requests, JSON responses, and HTTP error handling. |
+| Data persistence | [`server/lib/db.ts`](server/lib/db.ts), [`server/lib/migrations.ts`](server/lib/migrations.ts) | SQLite initialization and schema migrations. |
+| Workspace integration | [`server/lib/openclaw.ts`](server/lib/openclaw.ts) | Filesystem reads and normalization with fixture fallback. |
+| Workflow automation | [`server/lib/service.ts`](server/lib/service.ts) | Synchronization, simulated job/meeting runs, and persisted artifacts. |
+| Shared data contracts | [`shared/mission.ts`](shared/mission.ts) | TypeScript types used across the frontend and backend. |
+
+### Troubleshooting walkthrough
+
+After starting the app locally, use these read-only requests to inspect the API directly:
+
+```bash
+curl -i http://localhost:8787/api/mission/summary
+curl -i http://localhost:8787/api/mission/meetings/nonexistent-demo-id
+curl -i http://localhost:8787/api/mission/workspaces/demo/file
+```
+
+The first request should return mission JSON when initialization succeeds. The second should return `404` for an unknown meeting. The third should return `400` with `fileId is required.` because the query parameter is missing. These are code-based expectations for a local walkthrough, not a claim of automated test coverage.
+
+For an unexpected result:
+
+1. Record the URL, method, status, response body, and server terminal output.
+2. Compare the direct backend response with the browser request through Vite's `/api` proxy.
+3. Follow the handler in `server/index.ts` into `server/lib/service.ts`.
+4. Check the configured database and workspace paths, and whether the adapter is using fixture data.
+5. Document the expected behavior, reproduction steps, and relevant evidence before proposing a fix.
+
+| Symptom | First check |
+| --- | --- |
+| Browser API request fails but direct request succeeds | Vite proxy target and backend port. |
+| Dashboard displays unexpected agents or metrics | Workspace configuration and fixture fallback. |
+| Data initialization fails | Database directory permissions and the `better-sqlite3` installation. |
+| Generated audio is unavailable | Optional `edge-tts` dependency and browser speech fallback. |
+
+
 ## Screenshots
 
 These existing repository screenshots illustrate the interface and may show demo data or an earlier UI state.
